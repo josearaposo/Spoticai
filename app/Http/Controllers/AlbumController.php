@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
 use App\Models\Album;
+use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
@@ -12,55 +13,90 @@ class AlbumController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        //
-    }
+   {
+       return view('albumes.index', [
+           'albumes' => Album::all(),
+       ]);
+   }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAlbumRequest $request)
-    {
-        //
-    }
+   /**
+    * Show the form for creating a new resource.
+    */
+   public function create()
+   {
+       return view('albumes.create');
+   }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Album $album)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Album $album)
-    {
-        //
-    }
+   /**
+    * Store a newly created resource in storage.
+    */
+   public function store(Request $request)
+   {
+       $validated = $request->validate([
+           'titulo' => 'required|max:255',
+            'anyo' => 'required|max:4',
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAlbumRequest $request, Album $album)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Album $album)
-    {
-        //
-    }
+       ]);
+
+
+       $album = new Album();
+       $album->titulo = $validated['titulo'];
+       $album->anyo = $validated['anyo'];
+       $album->save();
+       session()->flash('success', 'El album se ha creado correctamente.');
+       return redirect()->route('albumes.index');
+   }
+
+
+   /**
+    * Display the specified resource.
+    */
+   public function show(Album $album)
+   {
+    return view('albumes.show', [
+        'album' => $album,
+    ]);
+   }
+
+
+   /**
+    * Show the form for editing the specified resource.
+    */
+   public function edit(Album $album)
+   {
+       return view('albumes.edit', [
+           'album' => $album,
+       ]);
+   }
+
+
+   /**
+    * Update the specified resource in storage.
+    */
+   public function update(Request $request, Album $album)
+   {
+    $validated = $request->validate([
+        'titulo' => 'required|max:255',
+         'anyo' => 'required|max:4',
+    ]);
+
+    $album->titulo = $validated['titulo'];
+    $album->anyo = $validated['anyo'];
+    $album->save();
+    session()->flash('success', 'El album se ha modificado correctamente.');
+    return redirect()->route('albumes.index');
+   }
+
+
+   /**
+    * Remove the specified resource from storage.
+    */
+   public function destroy(Album $album)
+   {
+       $album->delete();
+       return redirect()->route('albumes.index');
+   }
 }
